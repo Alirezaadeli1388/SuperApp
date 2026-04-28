@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="login">
+  <div class="glass">
+    <img id="loginAvatar" class="avatar hidden">
+    <h2 id="loginName" class="login-name">Welcome</h2>
+    <form id="loginForm">
+      <input type="password" id="pass" placeholder="Password">
+      <button type="submit">Enter</button>
+    </form>
+  </div>
+</div>
+
+<div id="userBox" class="hidden"></div>
+
+<div id="desktop" class="hidden">
+  <h1 id="greeting">Welcome</h1>
+  <div id="dock">
+    <button onclick="openWindow('Calculator')">Calculator</button>
+    <button onclick="openWindow('Note')">Note pad</button>
+    <button onclick="openWindow('Music')">Music</button>
+    <button onclick="openWindow('Contacts')">Contacts</button>
+    <button onclick="openWindow('Tool')">Tool</button>
+    <button onclick="openWindow('Settings')">Settings</button>
+  </div>
+  <div id="windows"></div>
+</div>
+
+<script type="module" src="js/main.js" defer></script>
+</body>
+</html>
