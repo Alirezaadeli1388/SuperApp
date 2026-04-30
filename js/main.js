@@ -21,4 +21,14 @@ function createClock() {
 
 createClock();
 
+window.addEventListener("DOMContentLoaded", () => {
+  const savedBg = localStorage.getItem("bgImage");
+
+  if (savedBg) {
+    document.body.style.backgroundImage = `url(${savedBg})`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+  }
+});
+
 window.openWindow = openWindow;

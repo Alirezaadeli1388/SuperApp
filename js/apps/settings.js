@@ -1,4 +1,4 @@
-export function renderSettings(el){
+export function renderSettings(el) {
 
   el.innerHTML = `
     <h1>Settings</h1>
@@ -29,7 +29,7 @@ export function renderSettings(el){
 
     let users = JSON.parse(localStorage.users || "[]");
 
-    if(users.length === 0){
+    if (users.length === 0) {
       alert("No user found");
       return;
     }
@@ -40,7 +40,7 @@ export function renderSettings(el){
     const userIndex = 0; // یا currentUser واقعی اگر داری
     const user = users[userIndex];
 
-    if(hashOld !== user.pass){
+    if (hashOld !== user.pass) {
       alert("Wrong old password");
       return;
     }
@@ -57,13 +57,22 @@ export function renderSettings(el){
     alert("Password updated");
   };
 
-  // 🖼 بک‌گراند
   el.querySelector('#bgUpload').onchange = (e) => {
     const file = e.target.files[0];
-    const url = URL.createObjectURL(file);
-    document.body.style.backgroundImage = `url(${url})`;
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundPosition = "center";
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const base64 = reader.result;
+
+      document.body.style.backgroundImage = `url(${base64})`;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center";
+
+      localStorage.setItem("bgImage", base64);
+    };
+
+    reader.readAsDataURL(file);
   };
 
   // 🔹 profile save
@@ -71,14 +80,14 @@ export function renderSettings(el){
     const name = el.querySelector('#userName').value;
     const file = el.querySelector('#avatarUpload').files[0];
 
-    if(!file){
+    if (!file) {
       alert("Select image");
       return;
     }
 
     const reader = new FileReader();
 
-    reader.onload = function(){
+    reader.onload = function () {
       let users = JSON.parse(localStorage.users || "[]");
       let current = JSON.parse(localStorage.currentUser || "{}");
 
