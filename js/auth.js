@@ -48,6 +48,7 @@ async function login(){
   // 👇 این خط باعث نمایش اپ‌ها میشه
   desktop.classList.remove('hidden');
   userBox.classList.add('show');
+  document.getElementById("dock").classList.add("show");
   document.getElementById('clock').classList.add('move');
 
   setTimeout(() => {
