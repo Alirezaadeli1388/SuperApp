@@ -23,8 +23,8 @@ export function renderCalculator(el) {
       <button data-val="3">3</button>
       <button data-val="-">−</button>
 
-      <button data-val="0">0</button>
       <button data-val=".">.</button>
+      <button data-val="0">0</button>
       <button id="back">⌫</button>
       <button data-val="+">+</button>
       </div>
@@ -36,19 +36,19 @@ export function renderCalculator(el) {
   const result = el.querySelector('#r');
 
   // دکمه‌های عدد و عملگر
-  el.querySelectorAll('#buttons button[data-val]').forEach(btn => {
-    btn.onclick = () => {
+  el.querySelectorAll('#calc_buttons button[data-val]').forEach(btn => {
+    btn.addEventListener('pointerdown', () => {
       input.value += btn.dataset.val;
-    };
+    });
   });
 
   // بک اسپیس
-  el.querySelector('#back').onclick = () => {
+  el.querySelector('#back').addEventListener('pointerdown', () => {
     input.value = input.value.slice(0, -1);
-  };
+  });
 
   // مساوی
-  el.querySelector('#eq').onclick = () => {
+  el.querySelector('#eq').addEventListener('pointerdown', () => {
     const res = calcEval(input.value);
 
     if (res === 'Error') {
@@ -58,7 +58,7 @@ export function renderCalculator(el) {
       input.value = res;
       result.innerText = '';
     }
-  };
+  });
 
   // استایل برای گرید
   const style = document.createElement('style');
@@ -69,7 +69,7 @@ export function renderCalculator(el) {
       grid-template-columns: repeat(4, 60px);
       gap: 10px;
       margin: 10px 0;
-      text_align: center;
+      text-align: center;
       justify-content: center;
       align-items: center;
     }
@@ -96,28 +96,28 @@ export function renderCalculator(el) {
   `;
   document.head.appendChild(style);
 
-  document.addEventListener('keydown', (e)=>{
-  const key = e.key;
+  document.addEventListener('keydown', (e) => {
+    const key = e.key;
 
-  // اعداد و عملگرها
-  if(/[0-9+\-*/.()]/.test(key)){
-    input.value += key;
-  }
+    // اعداد و عملگرها
+    if (/[0-9+\-*/.()]/.test(key)) {
+      input.value += key;
+    }
 
-  // اینتر = محاسبه
-  else if(key === 'Enter'){
-    const res = calcEval(input.value);
-    input.value = res === 'Error' ? '' : res;
-  }
+    // اینتر = محاسبه
+    else if (key === 'Enter') {
+      const res = calcEval(input.value);
+      input.value = res === 'Error' ? '' : res;
+    }
 
-  // بک‌اسپیس
-  else if(key === 'Backspace'){
-    input.value = input.value.slice(0, -1);
-  }
+    // بک‌اسپیس
+    else if (key === 'Backspace') {
+      input.value = input.value.slice(0, -1);
+    }
 
-  // پاک کردن کامل
-  else if(key === 'Escape'){
-    input.value = '';
-  }
-});
+    // پاک کردن کامل
+    else if (key === 'Escape') {
+      input.value = '';
+    }
+  });
 }
