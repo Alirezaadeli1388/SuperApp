@@ -41,11 +41,14 @@ export function openWindow(app) {
 
   w.className = 'window';
 
-  const width = 1000;
-  const height = 600;
+  const isTablet = window.innerWidth <= 1024;
+
+  const width = isTablet ? window.innerWidth * 0.8 : 1000;
+  const height = isTablet ? window.innerHeight * 0.7 : 600;
 
   w.style.width = width + 'px';
   w.style.height = height + 'px';
+  center(w, width, height);
 
   // ================= TITLE BAR =================
   const bar = document.createElement('div');
