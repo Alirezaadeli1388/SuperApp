@@ -7,15 +7,47 @@ import { renderTool } from './apps/tool.js';
 
 let z = 1;
 
+const windows = {};
+const dockState = {};
+
+const dock = document.getElementById('dock');
+const container = document.getElementById('windows');
+
+const map = {
+  Calculator: renderCalculator,
+  Note: renderNotes,
+  Music: renderMusic,
+  Contacts: renderContacts,
+  Settings: renderSettings,
+  Tool: renderTool
+};
+
+// ================= OPEN WINDOW =================
 export function openWindow(app) {
-  const w = document.createElement('div');
+  let w = windows[app];
+
+  // اگر پنجره قبلاً وجود دارد
+  if (w) {
+    w.style.display = 'block';
+    w.style.pointerEvents = 'auto';
+    w.style.zIndex = ++z;
+    dockState[app] = false;
+    return;
+  }
+
+  // ساخت پنجره
+  w = document.createElement('div');
+  windows[app] = w;
+
   w.className = 'window';
-  w.style.zIndex = ++z;
 
   const width = 1000;
   const height = 600;
 
-  // ---------- TITLE BAR ----------
+  w.style.width = width + 'px';
+  w.style.height = height + 'px';
+
+  // ================= TITLE BAR =================
   const bar = document.createElement('div');
   bar.className = 'titlebar';
 
@@ -24,11 +56,22 @@ export function openWindow(app) {
 
   const controls = document.createElement('div');
 
+  // ================= MINIMIZE =================
   const min = document.createElement('button');
   min.style.backgroundColor = "gold";
-  min.onclick = () => w.style.display = 'none';
 
-  // ---------- MAXIMIZE LOGIC ----------
+  min.onclick = () => {
+    w.classList.add('minimizeAnim');
+
+    setTimeout(() => {
+      w.style.display = 'none';
+      w.classList.remove('minimizeAnim');
+    }, 300);
+
+    dockState[app] = true;
+  };
+
+  // ================= MAXIMIZE =================
   let isMax = false;
   let prev = {};
 
@@ -37,119 +80,102 @@ export function openWindow(app) {
 
   max.onclick = () => {
     if (!isMax) {
+      const rect = w.getBoundingClientRect();
+
       prev = {
-        left: w.style.left,
-        top: w.style.top,
-        width: w.style.width,
-        height: w.style.height
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height
       };
 
-      document.body.appendChild(w);
       w.classList.add('maximized');
 
-      w.style.left = '0';
-      w.style.top = '0';
+      w.style.left = '0px';
+      w.style.top = '0px';
+      w.style.width = '100vw';
+      w.style.height = '100vh';
 
       isMax = true;
     } else {
       w.classList.remove('maximized');
+      w.classList.add('restoreAnim');
 
-      document.getElementById('windows').appendChild(w);
+      w.style.left = prev.left + 'px';
+      w.style.top = prev.top + 'px';
+      w.style.width = prev.width + 'px';
+      w.style.height = prev.height + 'px';
 
-      w.style.left = prev.left;
-      w.style.top = prev.top;
-      w.style.width = prev.width;
-      w.style.height = prev.height;
+      setTimeout(() => {
+        w.classList.remove('restoreAnim');
+      }, 300);
 
       isMax = false;
     }
   };
 
+  // ================= CLOSE =================
   const close = document.createElement('button');
   close.style.backgroundColor = "darkred";
-  close.onclick = () => w.remove();
+
+  close.onclick = () => {
+    w.classList.add('closeAnim');
+
+    setTimeout(() => {
+      delete windows[app];
+      w.remove();
+    }, 250);
+  };
 
   controls.append(min, max, close);
   bar.append(title, controls);
 
-  // ---------- CONTENT ----------
+  // ================= CONTENT =================
   const content = document.createElement('div');
   content.className = 'window-content';
 
   w.append(bar, content);
+  container.appendChild(w);
 
-  document.getElementById('windows').appendChild(w);
-
-  // ---------- CENTER POSITION (FIXED) ----------
-    w.style.width = width + 'px';
-    w.style.height = height + 'px';
-
-    requestAnimationFrame(() => {
-    // ---------- SIZE ----------
-    w.style.width = width + 'px';
-    w.style.height = height + 'px';
-
-    // 🔥 اول اضافه کن
-    document.getElementById('windows').appendChild(w);
-
-    // 🔥 بعد center کن (بدون requestAnimationFrame)
-    centerWindow(w, width, height);
-  });
-
-  // ---------- DRAG ----------
+  center(w, width, height);
   drag(w, bar);
 
-  // ---------- ROUTER ----------
-  if (app === 'Calculator') renderCalculator(content);
-  if (app === 'Note') renderNotes(content);
-  if (app === 'Music') renderMusic(content);
-  if (app === 'Contacts') renderContacts(content);
-  if (app === 'Settings') renderSettings(content);
-  if (app === 'Tool') renderTool(content);
+  // ================= ROUTER =================
+  map[app]?.(content);
 }
 
-// ---------- DRAG FUNCTION (FIXED) ----------
+// ================= DRAG =================
 function drag(el, bar) {
   let offsetX = 0;
   let offsetY = 0;
+  let dragging = false;
 
-  bar.onmousedown = (e) => {
-    if (el.classList.contains('maximized')) return;
+  bar.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return;
 
-    el.style.zIndex = ++z;
+    dragging = true;
 
-    offsetX = e.clientX - el.offsetLeft;
-    offsetY = e.clientY - el.offsetTop;
+    const rect = el.getBoundingClientRect();
 
-    document.onmousemove = (e2) => {
-      if (el.classList.contains('maximized')) return;
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
 
-      el.style.left = (e2.clientX - offsetX) + 'px';
-      el.style.top = (e2.clientY - offsetY) + 'px';
-    };
+    bar.setPointerCapture(e.pointerId);
+  });
 
-    document.onmouseup = () => {
-      document.onmousemove = null;
-    };
-  };
+  bar.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+
+    el.style.left = (e.clientX - offsetX) + 'px';
+    el.style.top = (e.clientY - offsetY) + 'px';
+  });
+
+  bar.addEventListener('pointerup', () => dragging = false);
+  bar.addEventListener('pointercancel', () => dragging = false);
 }
 
-function centerWindow(w, width, height) {
-  requestAnimationFrame(() => {
-    w.style.left = `${(window.innerWidth - width) / 2}px`;
-    w.style.top = `${(window.innerHeight - height) / 2}px`;
-  });
+// ================= CENTER =================
+function center(w, width, height) {
+  w.style.left = `${(window.innerWidth - width) / 2}px`;
+  w.style.top = `${(window.innerHeight - height) / 2}px`;
 }
-
-window.addEventListener('resize', () => {
-  document.querySelectorAll('.window').forEach(w => {
-    if (w.classList.contains('maximized')) return;
-
-    const width = parseInt(w.style.width || 600);
-    const height = parseInt(w.style.height || 400);
-
-    w.style.left = `${(window.innerWidth - width) / 2}px`;
-    w.style.top = `${(window.innerHeight - height) / 2}px`;
-  });
-});
-

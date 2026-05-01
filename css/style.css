@@ -93,9 +93,9 @@ body::before {
   flex-direction: column;
 
   overflow: hidden;
-
   text-align: center;
 
+  /* 🔥 همون استایل قبلی (اصلی) */
   background: rgba(15, 15, 20, 0.35);
   backdrop-filter: blur(22px) saturate(180%);
   -webkit-backdrop-filter: blur(22px) saturate(180%);
@@ -106,9 +106,15 @@ body::before {
     0 20px 60px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
+  /* 🔥 مهم برای جلوگیری از گلیچ */
   transform-origin: center;
-  animation: windowOpen 0.35s cubic-bezier(0.2, 0.9, 0.2, 1);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  transition: none;
 }
+
 
 /* content scroll area */
 .window>div:last-child {
@@ -147,6 +153,19 @@ body::before {
   animation: maximizeAnim 0.25s ease;
 }
 
+/*window minimize*/
+
+.window.minimizing {
+  transform: scale(0.85) translateY(100px);
+  opacity: 0;
+}
+
+/*window restore*/
+.window.restoring {
+  transform: scale(1.05);
+  opacity: 0.7;
+}
+
 /* close animation */
 .window.hideAnim {
   animation: windowClose 0.25s ease forwards;
@@ -156,7 +175,9 @@ body::before {
    TITLEBAR
 ========================= */
 .titlebar {
-  flex: 0 0 40px;
+  height: 50px;
+  flex: 0 0 50px;
+  box-sizing: border-box;
 
   display: flex;
   justify-content: space-between;
@@ -275,7 +296,9 @@ button:active {
   transform: scale(0.98);
 }
 
-/* dock buttons */
+/* =========================
+   DOCK
+========================= */
 #dock {
   position: fixed !important;
   bottom: -300px;
@@ -633,7 +656,6 @@ textarea:hover {
 #clock {
   position: fixed;
   top: 12%;
-  /* 🔥 بالا */
   left: 50%;
   transform: translateX(-50%);
 
@@ -711,8 +733,6 @@ option {
 /* =========================
    CONTACTS APP
 ========================= */
-
-
 #contact {
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(18px);
@@ -737,9 +757,6 @@ option {
   animation: noteIn 0.25s ease-out;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
-
-
 
 /* =========================
    ANIMATIONS
@@ -799,7 +816,6 @@ option {
   }
 }
 
-
 @keyframes dockPop {
   0% {
     bottom: -120px;
@@ -813,3 +829,74 @@ option {
     bottom: 20px;
   }
 }
+
+/* =========================
+   WINDOW FX IMPROVEMENTS
+========================= */
+
+/* ورود پنجره */
+.window {
+  animation: windowOpen 0.35s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+/* مینیمایز */
+.window.minimizeAnim {
+  animation: minimizeFX 0.35s ease forwards;
+}
+
+/* رستور */
+.window.restoreAnim {
+  animation: restoreFX 0.35s ease forwards;
+}
+
+/* کلوز */
+.window.closeAnim {
+  animation: closeFX 0.25s ease forwards;
+}
+
+/* ماکزیمایز نرم‌تر */
+.window.maximized {
+  animation: maximizeFX 0.35s cubic-bezier(0.2, 1, 0.2, 1);
+}
+
+/* =========================
+   KEYFRAMES
+========================= */
+
+@keyframes minimizeFX {
+  to {
+    transform: scale(0.2) translateY(200px);
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+
+@keyframes restoreFX {
+  from {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes closeFX {
+  to {
+    transform: scale(0.6) translateY(80px);
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+
+@keyframes maximizeFX {
+  from {
+    transform: scale(0.95);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+

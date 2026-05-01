@@ -7,7 +7,7 @@ export function renderCalculator(el) {
   el.innerHTML = `
   <input id='c' readonly>
   <div id='r'></div>
-  <div id="buttons">
+  <div id="calc_buttons">
       <button data-val="7">7</button>
       <button data-val="8">8</button>
       <button data-val="9">9</button>
@@ -64,7 +64,7 @@ export function renderCalculator(el) {
   const style = document.createElement('style');
   style.innerHTML = `
 
-    #buttons{
+    #calc_buttons{
       display: grid;
       grid-template-columns: repeat(4, 60px);
       gap: 10px;
@@ -74,7 +74,7 @@ export function renderCalculator(el) {
       align-items: center;
     }
 
-    #buttons button{
+    #calc_buttons button{
       height: 60px;
       width: 60px;
       font-size: 20px;
@@ -82,7 +82,7 @@ export function renderCalculator(el) {
       margin: 0;
     }
 
-    input{
+    #c {
       width: 210px;
       height: 30px;
       margin-bottom: 10px;
