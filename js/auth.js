@@ -65,7 +65,6 @@ const users = JSON.parse(localStorage.users || "[]");
 
 if(users.length > 0 && users[0].avatar){
   const img = document.getElementById("loginAvatar");
-  const users = JSON.parse(localStorage.users || "[]");
 
   if(users.length > 0 && users[0].avatar){
     img.src = users[0].avatar;
@@ -125,3 +124,13 @@ function updateGreeting(){
     el.textContent = `${text} ${name} :)`;
   }
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("loginForm").addEventListener("submit", e => {
+    e.preventDefault();
+    login();
+  });
+
+  // 👇 اینجا اگر کدهایی داری که getElementById استفاده می‌کنن هم باید باشن
+  loadUserPreview();
+});

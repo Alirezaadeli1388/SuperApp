@@ -150,7 +150,7 @@ function drag(el, bar) {
   let offsetY = 0;
   let dragging = false;
 
-  bar.addEventListener('pointerdown', (e) => {
+  const start = (e) => {
     if (e.target.closest('button')) return;
 
     dragging = true;
@@ -160,18 +160,29 @@ function drag(el, bar) {
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
 
-    bar.setPointerCapture(e.pointerId);
-  });
+    e.preventDefault();
+  };
 
-  bar.addEventListener('pointermove', (e) => {
+  const move = (e) => {
     if (!dragging) return;
 
-    el.style.left = (e.clientX - offsetX) + 'px';
-    el.style.top = (e.clientY - offsetY) + 'px';
-  });
+    el.style.position = 'fixed';
+    el.style.left = `${e.clientX - offsetX}px`;
+    el.style.top = `${e.clientY - offsetY}px`;
 
-  bar.addEventListener('pointerup', () => dragging = false);
-  bar.addEventListener('pointercancel', () => dragging = false);
+    e.preventDefault();
+  };
+
+  const end = () => {
+    dragging = false;
+  };
+
+  bar.addEventListener('pointerdown', start);
+
+  // 🔥 مهم: روی window نه bar
+  window.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', end);
+  window.addEventListener('pointercancel', end);
 }
 
 // ================= CENTER =================

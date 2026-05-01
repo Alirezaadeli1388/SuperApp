@@ -193,6 +193,7 @@ body::before {
   -webkit-backdrop-filter: blur(18px) saturate(180%);
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  touch-action: none;
 }
 
 /* titlebar buttons */
@@ -876,6 +877,7 @@ option {
     transform: scale(0.85);
     opacity: 0.5;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -894,9 +896,8 @@ option {
   from {
     transform: scale(0.95);
   }
+
   to {
     transform: scale(1);
   }
 }
-
-
