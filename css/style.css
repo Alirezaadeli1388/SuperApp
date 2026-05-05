@@ -339,6 +339,7 @@ button:active {
   padding: 10px;
   font-size: 10px;
   border-radius: 25px;
+  position: relative;
 }
 
 #dock button img {
@@ -348,6 +349,23 @@ button:active {
   object-fit: contain;
   pointer-events: none;
   /* کلیک فقط روی دکمه باشه */
+}
+
+#dock .dot {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: white;
+  opacity: 0;
+  transition: 0.2s;
+}
+
+#dock button.active .dot {
+  opacity: 1;
 }
 
 #dock button:hover {
@@ -757,6 +775,15 @@ option {
 
   animation: noteIn 0.25s ease-out;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#search {
+  display: flex;
+  width: 65%;
+  margin-bottom: 20px;
+  justify-content: center;
+  text-align: center;
+  justify-self: center; 
 }
 
 /* =========================

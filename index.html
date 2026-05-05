@@ -1,38 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>App</title>
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-<div id="login">
-  <div class="glass">
-    <img id="loginAvatar" class="avatar hidden">
-    <h2 id="loginName" class="login-name">Welcome</h2>
-    <form id="loginForm">
-      <input type="password" id="pass" placeholder="Password">
-      <button type="submit">Enter</button>
-    </form>
+  <div id="login">
+    <div class="glass">
+      <img id="loginAvatar" class="avatar hidden">
+      <h2 id="loginName" class="login-name">Welcome</h2>
+      <form id="loginForm">
+        <input type="password" id="pass" placeholder="Password">
+        <button type="submit">Enter</button>
+      </form>
+    </div>
   </div>
-</div>
 
-<div id="userBox" class="hidden"></div>
+  <div id="userBox" class="hidden"></div>
 
-<div id="desktop" class="hidden">
-  <h1 id="greeting">Welcome</h1>
-</div>
-<div id="windows"></div>
-<div id="dock">
-  <button onclick="openWindow('Calculator')"><img src="./assets/images/icons/calculator.png" alt="Calculator"></button>
-  <button onclick="openWindow('Note')"><img src="./assets/images/icons/notes_macos_bigsur_icon_189901.png" alt="Note"></button>
-  <button onclick="openWindow('Music')"><img src="./assets/images/icons/ios-music.png" alt="Music"></button>
-  <button onclick="openWindow('Contacts')"><img src="./assets/images/icons/contact.png" alt="contact"></button>
-  <button onclick="openWindow('Settings')"><img src="./assets/images/icons/system-preferences.png" alt="Settings"></button>
-  <button onclick="openWindow('Tool')"><img src="./assets/images/icons/tools.png  " alt="Tool"></button>
-</div>
+  <div id="desktop" class="hidden">
+    <h1 id="greeting">Welcome</h1>
+  </div>
+  <div id="windows"></div>
+  <div id="dock">
+    <button data-app="Calculator" onclick="openWindow('Calculator')">
+      <img src="./assets/images/icons/calculator.png">
+      <span class="dot"></span>
+    </button>
 
-<script type="module" src="js/main.js" defer></script>
+    <button data-app="Note" onclick="openWindow('Note')">
+      <img src="./assets/images/icons/notes_macos_bigsur_icon_189901.png">
+      <span class="dot"></span>
+    </button>
+
+    <button data-app="Music" onclick="openWindow('Music')">
+      <img src="./assets/images/icons/ios-music.png">
+      <span class="dot"></span>
+    </button>
+
+    <button data-app="Contacts" onclick="openWindow('Contacts')">
+      <img src="./assets/images/icons/contact.png">
+      <span class="dot"></span>
+    </button>
+
+    <button data-app="Settings" onclick="openWindow('Settings')">
+      <img src="./assets/images/icons/system-preferences.png">
+      <span class="dot"></span>
+    </button>
+
+    <button data-app="Tool" onclick="openWindow('Tool')">
+      <img src="./assets/images/icons/tools.png">
+      <span class="dot"></span>
+    </button>
+  </div>
+
+  <script type="module" src="js/main.js" defer></script>
 </body>
+
 </html>

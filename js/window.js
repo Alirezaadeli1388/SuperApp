@@ -8,12 +8,9 @@ import { renderTool } from './apps/tool.js';
 let z = 1;
 
 const windows = {};
-const dockState = {};
-
-const dock = document.getElementById('dock');
 const container = document.getElementById('windows');
 
-const map = {
+const appMap = {
   Calculator: renderCalculator,
   Note: renderNotes,
   Music: renderMusic,
@@ -22,32 +19,44 @@ const map = {
   Tool: renderTool
 };
 
+// ================= DOCK STATE =================
+function setDockActive(app, state) {
+  const btn = document.querySelector(`#dock button[data-app="${app}"]`);
+  if (!btn) return;
+
+  btn.classList.toggle('active', state);
+}
+
 // ================= OPEN WINDOW =================
 export function openWindow(app) {
   let w = windows[app];
 
-  // اگر پنجره قبلاً وجود دارد
+  // اگر پنجره وجود دارد
   if (w) {
     w.style.display = 'block';
     w.style.pointerEvents = 'auto';
     w.style.zIndex = ++z;
-    dockState[app] = false;
+
+    w.classList.remove('minimized');
+    w.classList.remove('minimizeAnim');
+
+    setDockActive(app, true);
     return;
   }
 
-  // ساخت پنجره
+  // ساخت پنجره جدید
   w = document.createElement('div');
   windows[app] = w;
 
   w.className = 'window';
 
   const isTablet = window.innerWidth <= 1024;
-
   const width = isTablet ? window.innerWidth * 0.8 : 1000;
   const height = isTablet ? window.innerHeight * 0.7 : 600;
 
   w.style.width = width + 'px';
   w.style.height = height + 'px';
+
   center(w, width, height);
 
   // ================= TITLE BAR =================
@@ -61,25 +70,28 @@ export function openWindow(app) {
 
   // ================= MINIMIZE =================
   const min = document.createElement('button');
-  min.style.backgroundColor = "gold";
+  min.style.background = "gold";
 
   min.onclick = () => {
     w.classList.add('minimizeAnim');
 
+    if (w._dragStop) w._dragStop();
+
     setTimeout(() => {
       w.style.display = 'none';
       w.classList.remove('minimizeAnim');
-    }, 300);
+      w.classList.add('minimized');
+    }, 200);
 
-    dockState[app] = true;
+    setDockActive(app, true);
   };
 
   // ================= MAXIMIZE =================
   let isMax = false;
-  let prev = {};
+  let prev = null;
 
   const max = document.createElement('button');
-  max.style.backgroundColor = "green";
+  max.style.background = "green";
 
   max.onclick = () => {
     if (!isMax) {
@@ -92,26 +104,25 @@ export function openWindow(app) {
         height: rect.height
       };
 
+      w.style.left = "0px";
+      w.style.top = "0px";
+      w.style.width = "100vw";
+      w.style.height = "100vh";
+
       w.classList.add('maximized');
-
-      w.style.left = '0px';
-      w.style.top = '0px';
-      w.style.width = '100vw';
-      w.style.height = '100vh';
-
       isMax = true;
     } else {
+      w.style.left = prev.left + "px";
+      w.style.top = prev.top + "px";
+      w.style.width = prev.width + "px";
+      w.style.height = prev.height + "px";
+
       w.classList.remove('maximized');
       w.classList.add('restoreAnim');
 
-      w.style.left = prev.left + 'px';
-      w.style.top = prev.top + 'px';
-      w.style.width = prev.width + 'px';
-      w.style.height = prev.height + 'px';
-
       setTimeout(() => {
         w.classList.remove('restoreAnim');
-      }, 300);
+      }, 200);
 
       isMax = false;
     }
@@ -119,15 +130,19 @@ export function openWindow(app) {
 
   // ================= CLOSE =================
   const close = document.createElement('button');
-  close.style.backgroundColor = "darkred";
+  close.style.background = "darkred";
 
   close.onclick = () => {
     w.classList.add('closeAnim');
 
     setTimeout(() => {
+      if (w._dragStop) w._dragStop();
+
       delete windows[app];
       w.remove();
-    }, 250);
+
+      setDockActive(app, false);
+    }, 200);
   };
 
   controls.append(min, max, close);
@@ -143,8 +158,9 @@ export function openWindow(app) {
   center(w, width, height);
   drag(w, bar);
 
-  // ================= ROUTER =================
-  map[app]?.(content);
+  appMap[app]?.(content);
+
+  setDockActive(app, true);
 }
 
 // ================= DRAG =================
@@ -152,40 +168,49 @@ function drag(el, bar) {
   let offsetX = 0;
   let offsetY = 0;
   let dragging = false;
+  let pointerId = null;
 
   const start = (e) => {
     if (e.target.closest('button')) return;
 
     dragging = true;
+    pointerId = e.pointerId;
 
     const rect = el.getBoundingClientRect();
 
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
 
-    e.preventDefault();
+    el.style.zIndex = ++z;
+
+    bar.setPointerCapture?.(pointerId);
   };
 
   const move = (e) => {
-    if (!dragging) return;
+    if (!dragging || e.pointerId !== pointerId) return;
 
     el.style.position = 'fixed';
     el.style.left = `${e.clientX - offsetX}px`;
     el.style.top = `${e.clientY - offsetY}px`;
-
-    e.preventDefault();
   };
 
-  const end = () => {
+  const end = (e) => {
+    if (e.pointerId !== pointerId) return;
+
     dragging = false;
+    pointerId = null;
+
+    bar.releasePointerCapture?.(e.pointerId);
   };
 
   bar.addEventListener('pointerdown', start);
-
-  // 🔥 مهم: روی window نه bar
   window.addEventListener('pointermove', move);
   window.addEventListener('pointerup', end);
-  window.addEventListener('pointercancel', end);
+
+  el._dragStop = () => {
+    dragging = false;
+    pointerId = null;
+  };
 }
 
 // ================= CENTER =================
